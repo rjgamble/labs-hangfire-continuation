@@ -1,23 +1,26 @@
 public class ExampleJobs
 {
-    public async Task JobApple()
+    public Task JobApple()
     {
         Console.WriteLine("Begin Job: apple");
-        await Task.Delay(3000);
+        Thread.Sleep(3000);
         Console.WriteLine("End Job: apple");
+        return Task.CompletedTask;
     }
 
-    public async Task JobBanana()
+    public Task JobBanana()
     {
         Console.WriteLine("Begin Job: banana");
-        await Task.Delay(3000);
+        Thread.Sleep(3000);
         Console.WriteLine("End Job: banana");
+        return Task.CompletedTask;
     }
 
-    public async Task JobKiwi()
+    public Task JobKiwi()
     {
         Console.WriteLine("Begin Job: kiwi");
-        await Task.Delay(3000);
+        Thread.Sleep(3000);
         Console.WriteLine("End Job: kiwi");
+        return Task.CompletedTask;
     }
 }

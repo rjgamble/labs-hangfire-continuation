@@ -15,9 +15,6 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddHangfire((serviceProvider, options) => 
 {
     options.UseDarkDashboard();
-
-    var config = serviceProvider.GetRequiredService<IConfiguration>();
-
     options.UseMemoryStorage();
 });
 
@@ -40,16 +37,14 @@ app.UseHangfireDashboard();
 
 app.MapPost("/enqueue", () => 
 {
-    BackgroundJob.Schedule<ExampleJobs>(job => job.JobApple(), TimeSpan.Zero);
-
     var appleId = BackgroundJob.Enqueue<ExampleJobs>(job => job.JobApple());
-    Console.WriteLine("Added Job: apple with ID {@id}", appleId);
+    Console.WriteLine("Added Job: apple with ID {0}", appleId.ToString());
 
     var bananaId = BackgroundJob.ContinueJobWith<ExampleJobs>(appleId, job => job.JobBanana());
-    Console.WriteLine("Added Job: banana with ID {@id}", bananaId);
+    Console.WriteLine("Added Job: banana with ID {0}", bananaId.ToString());
 
     var kiwiId = BackgroundJob.ContinueJobWith<ExampleJobs>(bananaId, job => job.JobKiwi());
-    Console.WriteLine("Added Job: kiwi with ID {@id}", kiwiId);
+    Console.WriteLine("Added Job: kiwi with ID {0}", kiwiId.ToString());
 })
 .WithName("Enqueue");
 
