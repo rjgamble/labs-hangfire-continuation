@@ -1,6 +1,7 @@
 using Hangfire;
 using Hangfire.MemoryStorage;
 using Hangfire.Dashboard.Dark;
+using Labs.Hangfire.Continuations.Jobs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,7 @@ builder.Services.AddHangfire((serviceProvider, options) =>
 {
     options.UseDarkDashboard();
     options.UseMemoryStorage();
+    options.UseBatches();
 });
 
 builder.Services.AddHangfireServer();
@@ -47,5 +49,19 @@ app.MapPost("/enqueue", () =>
     Console.WriteLine("Added Job: kiwi with ID {0}", kiwiId.ToString());
 })
 .WithName("Enqueue");
+
+app.MapPost("/enqueue-pro", (IBackgroundJobClient backgroundJobClient) =>
+{
+    var batchId = BatchJob.StartNew(q =>
+    {
+        q.Enqueue<ExampleBatchJobs>(j => j.Apple());
+        q.Enqueue<ExampleBatchJobs>(j => j.Banana());
+    });
+
+    backgroundJobClient.ContinueBatchWith<ExampleBatchJobs>(batchId,
+                                                            j => j.Kiwi(),
+                                                            options: Hangfire.Batches.BatchContinuationOptions.OnAnyFinishedState);
+})
+.WithName("Enqueue Pro");
 
 app.Run();
